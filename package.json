@@ -23,6 +23,7 @@
 		"typescript": "^3.8.3"
 	},
 	"dependencies": {
+		"colyseus.js": "^0.14.13",
 		"parcel": "^2.8.3",
 		"phaser": "^3.55.2"
 	},
