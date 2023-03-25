@@ -18,6 +18,8 @@ export default class HelloWorldScene extends Phaser.Scene
         down: false,
     }
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys
+    currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
+    remoteRef: Phaser.GameObjects.Rectangle // used for debugging
 
 	preload()
     {
@@ -46,9 +48,23 @@ export default class HelloWorldScene extends Phaser.Scene
             const entity = this.physics.add.image(player.x, player.y, 'ball')
             this.playerEntities[sessionId] = entity
 
-            player.onChange = () => {
-                entity.setData('serverX', player.x)
-                entity.setData('serverY', player.y)
+            if (sessionId === this.room.sessionId) {
+                // current player
+                this.currentPlayer = entity
+
+                this.remoteRef = this.add.rectangle(0, 0, entity.width, entity.height)
+                this.remoteRef.setStrokeStyle(1, 0xff0000)
+
+                player.onChange = () => {
+                    this.remoteRef.x = player.x
+                    this.remoteRef.y = player.y
+                }
+            } else {
+                // remote players
+                player.onChange = () => {
+                    entity.setData('serverX', player.x)
+                    entity.setData('serverY', player.y)
+                }
             }
         }
 
@@ -68,14 +84,36 @@ export default class HelloWorldScene extends Phaser.Scene
             return
         }
 
+        const velocity = 2;
         this.inputPayload.left = this.cursorKeys.left.isDown
         this.inputPayload.right = this.cursorKeys.right.isDown
         this.inputPayload.up = this.cursorKeys.up.isDown
         this.inputPayload.down = this.cursorKeys.down.isDown
         this.room.send(0, this.inputPayload)
 
+        if (this.inputPayload.left) {
+            this.currentPlayer.x -= velocity;
+        } else if (this.inputPayload.right) {
+            this.currentPlayer.x += velocity;
+        }
+
+        if (this.inputPayload.up) {
+            this.currentPlayer.y -= velocity;
+        } else if (this.inputPayload.down) {
+            this.currentPlayer.y += velocity;
+        }
+
         for (let sessionId in this.playerEntities) {
+            if (sessionId === this.room.sessionId) {
+                continue
+            }
+
             const entity = this.playerEntities[sessionId]
+
+            if (!entity.data) {
+                continue
+            }
+
             const { serverX, serverY } = entity.data.values
 
             entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15)
