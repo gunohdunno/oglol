@@ -20,6 +20,8 @@ export default class HelloWorldScene extends Phaser.Scene
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys
     currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
     remoteRef: Phaser.GameObjects.Rectangle // used for debugging
+    elapsedTime = 0
+    fixedTimeStep = 1000 / 60
 
 	preload()
     {
@@ -80,6 +82,18 @@ export default class HelloWorldScene extends Phaser.Scene
     }
 
     update(time: number, delta: number): void {
+        if (!this.currentPlayer) {
+            return
+        }
+
+        this.elapsedTime += delta
+        while (this.elapsedTime >= this.fixedTimeStep) {
+            this.elapsedTime -= this.fixedTimeStep
+            this.fixedTick(time, this.fixedTimeStep)
+        }
+    }
+
+    fixedTick(time: number, delta: number) {
         if (!this.room) {
             return
         }
@@ -119,6 +133,7 @@ export default class HelloWorldScene extends Phaser.Scene
             entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15)
             entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15)
         }
+
     }
 
     createHelloWorldVisuals() {
