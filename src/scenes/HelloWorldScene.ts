@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { Client, Room } from 'colyseus.js'
 
 export default class HelloWorldScene extends Phaser.Scene
 {
@@ -7,6 +8,17 @@ export default class HelloWorldScene extends Phaser.Scene
 		super('hello-world')
 	}
 
+    client = new Client("ws://localhost:2567")
+    room: Room;
+    playerEntities: {[ sessionId: string ]: any} = {}
+    inputPayload = {
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+    }
+    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys
+
 	preload()
     {
         this.load.setBaseURL('http://labs.phaser.io')
@@ -14,10 +26,56 @@ export default class HelloWorldScene extends Phaser.Scene
         this.load.image('sky', 'assets/skies/space3.png')
         this.load.image('logo', 'assets/sprites/phaser3-logo.png')
         this.load.image('red', 'assets/particles/red.png')
+        this.load.image('ball', 'assets/sprites/blue_ball.png')
+
+        this.cursorKeys = this.input.keyboard.createCursorKeys()
     }
 
-    create()
+    async create()
     {
+        console.log("Joining room...")
+
+        try {
+            this.room = await this.client.joinOrCreate("my_room")
+            console.log("Joined room successfully!")
+        } catch (e) {
+            console.error(e)
+        }
+
+        this.room.state.players.onAdd = (player, sessionId) => {
+            const entity = this.physics.add.image(player.x, player.y, 'ball')
+            this.playerEntities[sessionId] = entity
+
+            player.onChange = () => {
+                entity.x = player.x
+                entity.y = player.y
+            }
+        }
+
+        this.room.state.players.onRemove = (player, sessionId) => {
+            const entity = this.playerEntities[sessionId]
+            if (entity) {
+                entity.destroy()
+            }
+            delete this.playerEntities[sessionId]
+        }
+
+        // this.createHelloWorldVisuals()
+    }
+
+    update(time: number, delta: number): void {
+        if (!this.room) {
+            return
+        }
+
+        this.inputPayload.left = this.cursorKeys.left.isDown
+        this.inputPayload.right = this.cursorKeys.right.isDown
+        this.inputPayload.up = this.cursorKeys.up.isDown
+        this.inputPayload.down = this.cursorKeys.down.isDown
+        this.room.send(0, this.inputPayload)
+    }
+
+    createHelloWorldVisuals() {
         this.add.image(400, 300, 'sky')
 
         const particles = this.add.particles('red')
