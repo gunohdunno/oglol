@@ -47,8 +47,8 @@ export default class HelloWorldScene extends Phaser.Scene
             this.playerEntities[sessionId] = entity
 
             player.onChange = () => {
-                entity.x = player.x
-                entity.y = player.y
+                entity.setData('serverX', player.x)
+                entity.setData('serverY', player.y)
             }
         }
 
@@ -73,6 +73,14 @@ export default class HelloWorldScene extends Phaser.Scene
         this.inputPayload.up = this.cursorKeys.up.isDown
         this.inputPayload.down = this.cursorKeys.down.isDown
         this.room.send(0, this.inputPayload)
+
+        for (let sessionId in this.playerEntities) {
+            const entity = this.playerEntities[sessionId]
+            const { serverX, serverY } = entity.data.values
+
+            entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15)
+            entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15)
+        }
     }
 
     createHelloWorldVisuals() {
