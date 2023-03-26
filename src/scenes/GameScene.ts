@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { Client, Room } from 'colyseus.js'
+import { Projectile, ProjectileGroup } from '../components/Projectile'
 
 export default class GameScene extends Phaser.Scene
 {
@@ -23,15 +24,14 @@ export default class GameScene extends Phaser.Scene
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
     roomId: string = ""
+    projectileGroup: ProjectileGroup | undefined
 
 	preload()
     {
         this.load.setBaseURL('http://labs.phaser.io')
 
-        this.load.image('sky', 'assets/skies/space3.png')
-        this.load.image('logo', 'assets/sprites/phaser3-logo.png')
-        this.load.image('red', 'assets/particles/red.png')
         this.load.image('ball', 'assets/sprites/blue_ball.png')
+        this.load.image('projectile', 'assets/sprites/green_ball.png')
 
         this.cursorKeys = this.input.keyboard.createCursorKeys()
     }
@@ -44,9 +44,10 @@ export default class GameScene extends Phaser.Scene
 
     async create()
     {
-        console.log("Joining room...")
+        this.projectileGroup = new ProjectileGroup(this)
 
         try {
+            console.log("Joining room...")
             if (this.roomId) {
                 this.room = await this.client.joinById(this.roomId)
             } else {
@@ -96,7 +97,9 @@ export default class GameScene extends Phaser.Scene
             delete this.playerEntities[sessionId]
         }
 
-        // this.createHelloWorldVisuals()
+        this.input.on('pointerdown', (pointer) => {
+            this.projectileGroup.fireProjectile(this.currentPlayer?.x, this.currentPlayer?.y, pointer.x, pointer.y)
+        })
     }
 
     update(time: number, delta: number): void {
@@ -116,7 +119,7 @@ export default class GameScene extends Phaser.Scene
             return
         }
 
-        const velocity = 2;
+        const velocity = 6;
         this.inputPayload.left = this.cursorKeys.left.isDown
         this.inputPayload.right = this.cursorKeys.right.isDown
         this.inputPayload.up = this.cursorKeys.up.isDown
@@ -152,25 +155,5 @@ export default class GameScene extends Phaser.Scene
             entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15)
         }
 
-    }
-
-    createHelloWorldVisuals() {
-        this.add.image(400, 300, 'sky')
-
-        const particles = this.add.particles('red')
-
-        const emitter = particles.createEmitter({
-            speed: 100,
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD'
-        })
-
-        const logo = this.physics.add.image(400, 100, 'logo')
-
-        logo.setVelocity(100, 200)
-        logo.setBounce(1, 1)
-        logo.setCollideWorldBounds(true)
-
-        emitter.startFollow(logo)
     }
 }
