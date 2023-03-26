@@ -1,15 +1,15 @@
 import Phaser from 'phaser'
 import { Client, Room } from 'colyseus.js'
 
-export default class HelloWorldScene extends Phaser.Scene
+export default class GameScene extends Phaser.Scene
 {
 	constructor()
 	{
-		super('hello-world')
+		super('game-scene')
 	}
 
     client = new Client("ws://localhost:2567")
-    room: Room;
+    room: Room | undefined
     playerEntities: {[ sessionId: string ]: any} = {}
     inputPayload = {
         left: false,
@@ -17,11 +17,12 @@ export default class HelloWorldScene extends Phaser.Scene
         up: false,
         down: false,
     }
-    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys
-    currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody
-    remoteRef: Phaser.GameObjects.Rectangle // used for debugging
+    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys | undefined
+    currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined
+    remoteRef: Phaser.GameObjects.Rectangle | undefined // used for debugging
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
+    roomId: string = ""
 
 	preload()
     {
@@ -35,15 +36,32 @@ export default class HelloWorldScene extends Phaser.Scene
         this.cursorKeys = this.input.keyboard.createCursorKeys()
     }
 
+    init(data) {
+        if (data.roomId) {
+            this.roomId = data.roomId
+        }
+    }
+
     async create()
     {
         console.log("Joining room...")
 
         try {
-            this.room = await this.client.joinOrCreate("my_room")
+            if (this.roomId) {
+                this.room = await this.client.joinById(this.roomId)
+            } else {
+                this.room = await this.client.create("my_room")
+            }
             console.log("Joined room successfully!")
         } catch (e) {
             console.error(e)
+            return
+        }
+
+        this.roomId = this.room.id
+        const codeSpan = document.getElementById("room-code")
+        if (codeSpan) {
+            codeSpan.textContent = this.roomId
         }
 
         this.room.state.players.onAdd = (player, sessionId) => {
