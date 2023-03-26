@@ -20,7 +20,6 @@ export default class GameScene extends Phaser.Scene
     }
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys | undefined
     currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined
-    remoteRef: Phaser.GameObjects.Rectangle | undefined // used for debugging
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
     roomId: string = ""
@@ -72,14 +71,6 @@ export default class GameScene extends Phaser.Scene
             if (sessionId === this.room.sessionId) {
                 // current player
                 this.currentPlayer = entity
-
-                this.remoteRef = this.add.rectangle(0, 0, entity.width, entity.height)
-                this.remoteRef.setStrokeStyle(1, 0xff0000)
-
-                player.onChange = () => {
-                    this.remoteRef.x = player.x
-                    this.remoteRef.y = player.y
-                }
             } else {
                 // remote players
                 player.onChange = () => {
