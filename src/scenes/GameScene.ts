@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { Client, Room } from 'colyseus.js'
 import { Projectile, ProjectileGroup } from '../components/Projectile'
+import { Player } from '../components/Player'
 
 export default class GameScene extends Phaser.Scene
 {
@@ -11,7 +12,7 @@ export default class GameScene extends Phaser.Scene
 
     client = new Client("ws://localhost:2567")
     room: Room | undefined
-    playerEntities: {[ sessionId: string ]: any} = {}
+    playerEntities: {[ sessionId: string ]: Player } = {}
     inputPayload = {
         left: false,
         right: false,
@@ -19,7 +20,6 @@ export default class GameScene extends Phaser.Scene
         down: false,
     }
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys | undefined
-    currentPlayer: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
     roomId: string = ""
@@ -43,8 +43,6 @@ export default class GameScene extends Phaser.Scene
 
     async create()
     {
-        this.projectileGroup = new ProjectileGroup(this)
-
         try {
             console.log("Joining room...")
             if (this.roomId) {
@@ -65,34 +63,41 @@ export default class GameScene extends Phaser.Scene
         }
 
         this.room.state.players.onAdd = (player, sessionId) => {
-            const entity = this.physics.add.image(player.position.x, player.position.y, 'ball')
-            this.playerEntities[sessionId] = entity
+            const playerEntity = this.physics.add.image(player.position.x, player.position.y, 'ball')
+            const projectileGroup = new ProjectileGroup(this)
+            this.playerEntities[sessionId] = new Player(playerEntity, projectileGroup)
 
-            if (sessionId === this.room.sessionId) {
-                // current player
-                this.currentPlayer = entity
-            } else {
+            if (sessionId !== this.room?.sessionId) {
                 // remote players
                 player.position.onChange = () => {
                     // Need to further explore what the setData here is for.
                     // I guess it's just a place to store arbitrary data?
-                    entity.setData('serverX', player.position.x)
-                    entity.setData('serverY', player.position.y)
+                    playerEntity.setData('serverX', player.position.x)
+                    playerEntity.setData('serverY', player.position.y)
                 }
             }
         }
 
         this.room.state.players.onRemove = (player, sessionId) => {
-            const entity = this.playerEntities[sessionId]
-            if (entity) {
-                entity.destroy()
+            const playerEntity = this.playerEntities[sessionId]
+            if (playerEntity.entity) {
+                playerEntity.entity.destroy()
             }
             delete this.playerEntities[sessionId]
         }
 
         this.input.on('pointerdown', (pointer) => {
-            this.projectileGroup.fireProjectile(this.currentPlayer?.x, this.currentPlayer?.y, pointer.x, pointer.y)
+            this.currentPlayer().projectileGroup.fireProjectile(this.currentPlayer().entity.x, this.currentPlayer().entity.y, pointer.x, pointer.y)
             this.room?.send('playerInput', {shoot: {x: pointer.x, y: pointer.y}})
+        })
+
+        this.room.onMessage('shoot', (message) => {
+            const projectileGroup = this.playerEntities[message.playerId].projectileGroup
+            projectileGroup.fireProjectile(
+                message.position.x,
+                message.position.y,
+                message.velocity.x,
+                message.velocity.y)
         })
     }
 
@@ -121,15 +126,15 @@ export default class GameScene extends Phaser.Scene
         this.room.send('playerInput', this.inputPayload)
 
         if (this.inputPayload.left) {
-            this.currentPlayer.x -= velocity;
+            this.currentPlayer().entity.x -= velocity;
         } else if (this.inputPayload.right) {
-            this.currentPlayer.x += velocity;
+            this.currentPlayer().entity.x += velocity;
         }
 
         if (this.inputPayload.up) {
-            this.currentPlayer.y -= velocity;
+            this.currentPlayer().entity.y -= velocity;
         } else if (this.inputPayload.down) {
-            this.currentPlayer.y += velocity;
+            this.currentPlayer().entity.y += velocity;
         }
 
         for (let sessionId in this.playerEntities) {
@@ -137,7 +142,7 @@ export default class GameScene extends Phaser.Scene
                 continue
             }
 
-            const entity = this.playerEntities[sessionId]
+            const entity = this.playerEntities[sessionId].entity
 
             if (!entity.data) {
                 continue
@@ -149,5 +154,11 @@ export default class GameScene extends Phaser.Scene
             entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15)
         }
 
+    }
+
+    currentPlayer(): Player | undefined {
+        if (this.room) {
+            return this.playerEntities[this.room?.sessionId]
+        }
     }
 }

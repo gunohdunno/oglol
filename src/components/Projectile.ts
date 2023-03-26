@@ -1,6 +1,3 @@
-import { Vector } from "matter";
-import { Physics } from "phaser";
-
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
 		super(scene, x, y, 'projectile');
