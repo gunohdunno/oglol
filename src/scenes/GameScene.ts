@@ -65,7 +65,7 @@ export default class GameScene extends Phaser.Scene
         }
 
         this.room.state.players.onAdd = (player, sessionId) => {
-            const entity = this.physics.add.image(player.x, player.y, 'ball')
+            const entity = this.physics.add.image(player.position.x, player.position.y, 'ball')
             this.playerEntities[sessionId] = entity
 
             if (sessionId === this.room.sessionId) {
@@ -73,9 +73,11 @@ export default class GameScene extends Phaser.Scene
                 this.currentPlayer = entity
             } else {
                 // remote players
-                player.onChange = () => {
-                    entity.setData('serverX', player.x)
-                    entity.setData('serverY', player.y)
+                player.position.onChange = () => {
+                    // Need to further explore what the setData here is for.
+                    // I guess it's just a place to store arbitrary data?
+                    entity.setData('serverX', player.position.x)
+                    entity.setData('serverY', player.position.y)
                 }
             }
         }
@@ -90,6 +92,7 @@ export default class GameScene extends Phaser.Scene
 
         this.input.on('pointerdown', (pointer) => {
             this.projectileGroup.fireProjectile(this.currentPlayer?.x, this.currentPlayer?.y, pointer.x, pointer.y)
+            this.room?.send('playerInput', {shoot: {x: pointer.x, y: pointer.y}})
         })
     }
 
@@ -115,7 +118,7 @@ export default class GameScene extends Phaser.Scene
         this.inputPayload.right = this.cursorKeys.right.isDown
         this.inputPayload.up = this.cursorKeys.up.isDown
         this.inputPayload.down = this.cursorKeys.down.isDown
-        this.room.send('move', this.inputPayload)
+        this.room.send('playerInput', this.inputPayload)
 
         if (this.inputPayload.left) {
             this.currentPlayer.x -= velocity;
