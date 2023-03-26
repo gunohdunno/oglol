@@ -18,12 +18,22 @@ export default class GameScene extends Phaser.Scene
         right: false,
         up: false,
         down: false,
+        shoot: {
+            x: 0,
+            y: 0,
+            active: false,
+        }
     }
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys | undefined
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
     roomId: string = ""
     projectileGroup: ProjectileGroup | undefined
+    shootInput = {
+        x: 0,
+        y: 0,
+        active: false
+    }
 
 	preload()
     {
@@ -87,8 +97,13 @@ export default class GameScene extends Phaser.Scene
         }
 
         this.input.on('pointerdown', (pointer) => {
-            this.currentPlayer().projectileGroup.fireProjectile(this.currentPlayer().entity.x, this.currentPlayer().entity.y, pointer.x, pointer.y)
-            this.room?.send('playerInput', {shoot: {x: pointer.x, y: pointer.y}})
+            if (!this.shootInput.active) {
+                this.shootInput = {
+                    x: pointer.x,
+                    y: pointer.y,
+                    active: true
+                }
+            }
         })
 
         this.room.onMessage('shoot', (message) => {
@@ -123,6 +138,23 @@ export default class GameScene extends Phaser.Scene
         this.inputPayload.right = this.cursorKeys.right.isDown
         this.inputPayload.up = this.cursorKeys.up.isDown
         this.inputPayload.down = this.cursorKeys.down.isDown
+
+        if (this.shootInput.active) {
+            this.inputPayload.shoot = {
+                x: this.shootInput.x,
+                y: this.shootInput.y,
+                active: true
+            }
+            this.shootInput.active = false
+            this.currentPlayer().projectileGroup.fireProjectile(
+                this.currentPlayer().entity.x,
+                this.currentPlayer().entity.y,
+                this.shootInput.x,
+                this.shootInput.y)
+        } else {
+            this.inputPayload.shoot.active = false
+        }
+
         this.room.send('playerInput', this.inputPayload)
 
         if (this.inputPayload.left) {
