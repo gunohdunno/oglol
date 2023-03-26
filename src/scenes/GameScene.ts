@@ -1,4 +1,4 @@
-import Phaser from 'phaser'
+import Phaser, { Input } from 'phaser'
 import { Client, Room } from 'colyseus.js'
 import { Projectile, ProjectileGroup } from '../components/Projectile'
 import { Player } from '../components/Player'
@@ -8,6 +8,20 @@ interface DirectionKeys {
     down: Phaser.Input.Keyboard.Key,
     left: Phaser.Input.Keyboard.Key,
     right: Phaser.Input.Keyboard.Key,
+}
+
+interface ShootInput {
+    x: number,
+    y: number,
+    active: boolean
+}
+
+interface InputPayload {
+    left: boolean,
+    right: boolean,
+    up: boolean,
+    down: boolean,
+    shoot: ShootInput,
 }
 
 export default class GameScene extends Phaser.Scene
@@ -20,7 +34,7 @@ export default class GameScene extends Phaser.Scene
     client = new Client("ws://localhost:2567")
     room: Room | undefined
     playerEntities: {[ sessionId: string ]: Player } = {}
-    inputPayload = {
+    inputPayload: InputPayload = {
         left: false,
         right: false,
         up: false,
@@ -36,7 +50,7 @@ export default class GameScene extends Phaser.Scene
     fixedTimeStep = 1000 / 60
     roomId: string = ""
     projectileGroup: ProjectileGroup | undefined
-    shootInput = {
+    shootInput: ShootInput = {
         x: 0,
         y: 0,
         active: false
