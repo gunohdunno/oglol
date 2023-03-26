@@ -105,7 +105,7 @@ export default class GameScene extends Phaser.Scene
         }
     }
 
-    fixedTick(time: number, delta: number) {
+    fixedTick(_time: number, _delta: number) {
         if (!this.room) {
             return
         }
@@ -115,7 +115,7 @@ export default class GameScene extends Phaser.Scene
         this.inputPayload.right = this.cursorKeys.right.isDown
         this.inputPayload.up = this.cursorKeys.up.isDown
         this.inputPayload.down = this.cursorKeys.down.isDown
-        this.room.send(0, this.inputPayload)
+        this.room.send('move', this.inputPayload)
 
         if (this.inputPayload.left) {
             this.currentPlayer.x -= velocity;
