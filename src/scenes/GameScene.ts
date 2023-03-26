@@ -3,6 +3,13 @@ import { Client, Room } from 'colyseus.js'
 import { Projectile, ProjectileGroup } from '../components/Projectile'
 import { Player } from '../components/Player'
 
+interface DirectionKeys {
+    up: Phaser.Input.Keyboard.Key,
+    down: Phaser.Input.Keyboard.Key,
+    left: Phaser.Input.Keyboard.Key,
+    right: Phaser.Input.Keyboard.Key,
+}
+
 export default class GameScene extends Phaser.Scene
 {
 	constructor()
@@ -24,7 +31,7 @@ export default class GameScene extends Phaser.Scene
             active: false,
         }
     }
-    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys | undefined
+    directionKeys: DirectionKeys | undefined
     elapsedTime = 0
     fixedTimeStep = 1000 / 60
     roomId: string = ""
@@ -42,7 +49,12 @@ export default class GameScene extends Phaser.Scene
         this.load.image('ball', 'assets/sprites/blue_ball.png')
         this.load.image('projectile', 'assets/sprites/green_ball.png')
 
-        this.cursorKeys = this.input.keyboard.createCursorKeys()
+        this.directionKeys = {
+            up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+            down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+            left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+            right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+        }
     }
 
     init(data) {
@@ -134,10 +146,10 @@ export default class GameScene extends Phaser.Scene
         }
 
         const velocity = 6;
-        this.inputPayload.left = this.cursorKeys.left.isDown
-        this.inputPayload.right = this.cursorKeys.right.isDown
-        this.inputPayload.up = this.cursorKeys.up.isDown
-        this.inputPayload.down = this.cursorKeys.down.isDown
+        this.inputPayload.left = this.directionKeys.left.isDown
+        this.inputPayload.right = this.directionKeys.right.isDown
+        this.inputPayload.up = this.directionKeys.up.isDown
+        this.inputPayload.down = this.directionKeys.down.isDown
 
         if (this.shootInput.active) {
             this.inputPayload.shoot = {
