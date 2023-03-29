@@ -13,6 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: false
 		}
 	},
+	pixelArt: true,
 	scene: [MainMenuScene, GameScene]
 }
 

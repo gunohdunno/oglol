@@ -58,10 +58,10 @@ export default class GameScene extends Phaser.Scene
 
 	preload()
     {
-        this.load.setBaseURL('http://labs.phaser.io')
 
-        this.load.image('ball', 'assets/sprites/blue_ball.png')
-        this.load.image('projectile', 'assets/sprites/green_ball.png')
+        // load map tiles
+        this.load.image('tiles', 'assets/tilemaps/map_tileset.png')
+        this.load.tilemapTiledJSON('map', 'assets/tilemaps/map02.json')
 
         this.directionKeys = {
             up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
@@ -92,6 +92,19 @@ export default class GameScene extends Phaser.Scene
             return
         }
 
+        // create map
+        const map = this.make.tilemap({ key: "map" })
+
+        // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+        // Phaser's cache (i.e. the name you used in preload)
+        const tileset = map.addTilesetImage("map_tileset", "tiles")
+
+        // Parameters: layer name (or index) from Tiled, tileset, x, y
+        const belowLayer = map.createLayer('below_layer', tileset, 0, 0)
+
+        
+
+        // create room
         this.roomId = this.room.id
         const codeSpan = document.getElementById("room-code")
         if (codeSpan) {

@@ -1,0 +1,41 @@
+{
+	"textures": [
+		{
+			"image": "charactor01.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 386,
+				"h": 27
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Adam_run_16x16.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 384,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 7,
+						"w": 384,
+						"h": 25
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 384,
+						"h": 25
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:4c699d2737d1a94875ac2fa2442e4f85:03bff95be7519b43bee13f5fc5d5d72d:5fdcbbbf29df0716b701f8f9c380aea4$"
+	}
+}
