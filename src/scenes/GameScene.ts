@@ -118,7 +118,7 @@ export default class GameScene extends Phaser.Scene
                     playerEntity.setData('serverY', player.position.y)
                 }
             } else {
-                this.cameras.main.startFollow(playerEntity)
+                this.cameras.main.startFollow(playerEntity, false, 0.1, 0.1)
             }
         }
 
