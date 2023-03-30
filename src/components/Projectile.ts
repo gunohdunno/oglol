@@ -22,7 +22,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
 }
 
 export class ProjectileGroup extends Phaser.Physics.Arcade.Group {
-    constructor(scene) {
+    constructor(scene: Phaser.Scene) {
         super(scene.physics.world, scene)
         this.createMultiple({
             classType: Projectile,
