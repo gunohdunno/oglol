@@ -8,7 +8,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setActive(true)
         this.setVisible(true)
 
-        const vector = new Phaser.Math.Vector2(toX - fromX, toY - fromY).normalize().scale(1000)
+        const vector = new Phaser.Math.Vector2(toX, toY).normalize().scale(1000)
         this.setVelocity(vector.x, vector.y)
     }
 

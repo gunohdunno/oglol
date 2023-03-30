@@ -132,9 +132,11 @@ export default class GameScene extends Phaser.Scene
 
         this.input.on('pointerdown', (pointer) => {
             if (!this.shootInput.active) {
+                const x = pointer.x - (this.sys.game.canvas.width / 2)
+                const y = pointer.y - (this.sys.game.canvas.height / 2)
                 this.shootInput = {
-                    x: pointer.x,
-                    y: pointer.y,
+                    x,
+                    y,
                     active: true
                 }
             }
