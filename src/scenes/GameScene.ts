@@ -94,15 +94,8 @@ export default class GameScene extends Phaser.Scene
 
         // create map
         const map = this.make.tilemap({ key: "map" })
-
-        // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
-        // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("map_tileset", "tiles")
-
-        // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createLayer('below_layer', tileset, 0, 0)
-
-        
 
         // create room
         this.roomId = this.room.id
@@ -124,6 +117,8 @@ export default class GameScene extends Phaser.Scene
                     playerEntity.setData('serverX', player.position.x)
                     playerEntity.setData('serverY', player.position.y)
                 }
+            } else {
+                this.cameras.main.startFollow(playerEntity)
             }
         }
 
