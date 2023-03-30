@@ -98,6 +98,7 @@ export default class GameScene extends Phaser.Scene
         const map = this.make.tilemap({ key: "map" })
         const tileset = map.addTilesetImage("map_tileset", "tiles")
         const belowLayer = map.createLayer('below_layer', tileset, 0, 0)
+        const aboveLayer = map.createLayer('above_layer', tileset, 0, 0)
 
         // create room
         this.roomId = this.room.id
