@@ -33,7 +33,7 @@ export default class GameScene extends Phaser.Scene
 
     client = new Client("ws://localhost:2567")
     room: Room | undefined
-    playerEntities: {[ sessionId: string ]: Player } = {}
+    players: {[ sessionId: string ]: Player } = {}
     inputPayload: InputPayload = {
         left: false,
         right: false,
@@ -55,6 +55,7 @@ export default class GameScene extends Phaser.Scene
         y: 0,
         active: false
     }
+    playerGroup: Phaser.Physics.Arcade.Group | undefined
 
 	preload()
     {
@@ -104,30 +105,49 @@ export default class GameScene extends Phaser.Scene
             codeSpan.textContent = this.roomId
         }
 
-        this.room.state.players.onAdd = (player, sessionId) => {
-            const playerEntity = this.physics.add.image(player.position.x, player.position.y, 'ball')
+        this.playerGroup = new Phaser.Physics.Arcade.Group(this.physics.world, this)
+        this.room.state.players.onAdd = (playerState, sessionId) => {
+            const playerEntity = this.physics.add.image(playerState.position.x, playerState.position.y, 'ball')
             const projectileGroup = new ProjectileGroup(this)
-            this.playerEntities[sessionId] = new Player(playerEntity, projectileGroup)
+            this.players[sessionId] = new Player(playerEntity, projectileGroup)
+
+            if (!this.playerGroup) {
+                return
+            }
+            this.playerGroup?.add(playerEntity)
+            this.physics.add.overlap(
+                projectileGroup,
+                this.playerGroup,
+                (projectile: Phaser.Types.Physics.Arcade.GameObjectWithBody, playerBody: Phaser.Types.Physics.Arcade.GameObjectWithBody) => {
+                    if (playerBody !== playerEntity) {
+                        (projectile as Projectile).disable()
+                        const player = this.findPlayerByEntity(playerBody)
+                        player.unalive()
+                    }
+                },
+                undefined,
+                this)
 
             if (sessionId !== this.room?.sessionId) {
                 // remote players
-                player.position.onChange = () => {
+                playerState.position.onChange = () => {
                     // Need to further explore what the setData here is for.
                     // I guess it's just a place to store arbitrary data?
-                    playerEntity.setData('serverX', player.position.x)
-                    playerEntity.setData('serverY', player.position.y)
+                    playerEntity.setData('serverX', playerState.position.x)
+                    playerEntity.setData('serverY', playerState.position.y)
                 }
+
             } else {
                 this.cameras.main.startFollow(playerEntity, false, 0.1, 0.1)
             }
         }
 
-        this.room.state.players.onRemove = (player, sessionId) => {
-            const playerEntity = this.playerEntities[sessionId]
-            if (playerEntity.entity) {
-                playerEntity.entity.destroy()
+        this.room.state.players.onRemove = (_playerState, sessionId) => {
+            const player = this.players[sessionId]
+            if (player.entity) {
+                player.entity.destroy()
             }
-            delete this.playerEntities[sessionId]
+            delete this.players[sessionId]
         }
 
         this.input.on('pointerdown', (pointer) => {
@@ -143,7 +163,7 @@ export default class GameScene extends Phaser.Scene
         })
 
         this.room.onMessage('shoot', (message) => {
-            const projectileGroup = this.playerEntities[message.playerId].projectileGroup
+            const projectileGroup = this.players[message.playerId].projectileGroup
             projectileGroup.fireProjectile(
                 message.position.x,
                 message.position.y,
@@ -205,12 +225,12 @@ export default class GameScene extends Phaser.Scene
             this.currentPlayer().entity.y += velocity;
         }
 
-        for (let sessionId in this.playerEntities) {
+        for (let sessionId in this.players) {
             if (sessionId === this.room.sessionId) {
                 continue
             }
 
-            const entity = this.playerEntities[sessionId].entity
+            const entity = this.players[sessionId].entity
 
             if (!entity.data) {
                 continue
@@ -224,9 +244,20 @@ export default class GameScene extends Phaser.Scene
 
     }
 
-    currentPlayer(): Player | undefined {
+    currentPlayer(): Player {
         if (this.room) {
-            return this.playerEntities[this.room?.sessionId]
+            return this.players[this.room?.sessionId]
         }
+        throw "Room not initialized"
+    }
+
+    findPlayerByEntity(entity: any): Player {
+        for (let sessionId in this.players) {
+            const player = this.players[sessionId]
+            if (player.entity === entity) {
+                return player
+            }
+        }
+        throw "No player exists with that entity"
     }
 }

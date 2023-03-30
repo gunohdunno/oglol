@@ -12,11 +12,15 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(vector.x, vector.y)
     }
 
+    disable() {
+        this.setActive(false)
+        this.setVisible(false)
+    }
+
     protected preUpdate(time: number, delta: number): void {
         super.preUpdate(time, delta)
         if ((this.y <= 0 || this.y >= 1500) || (this.x <= 0 || this.x >= 1500)) {
-            this.setActive(false)
-            this.setVisible(false)
+            this.disable()
         }
     }
 }
@@ -37,6 +41,8 @@ export class ProjectileGroup extends Phaser.Physics.Arcade.Group {
         const projectile = this.getFirstDead(false)
         if (projectile) {
             projectile.fire(fromX, fromY, toX, toY)
+        } else {
+            console.log("No projectile...")
         }
     }
 }
