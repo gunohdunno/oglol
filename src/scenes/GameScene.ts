@@ -56,6 +56,7 @@ export default class GameScene extends Phaser.Scene
         active: false
     }
     playerGroup: Phaser.Physics.Arcade.Group | undefined
+    healthText: Phaser.GameObjects.Text | undefined
 
 	preload()
     {
@@ -122,7 +123,7 @@ export default class GameScene extends Phaser.Scene
                     if (playerBody !== playerEntity) {
                         (projectile as Projectile).disable()
                         const player = this.findPlayerByEntity(playerBody)
-                        player.unalive()
+                        this.damagePlayer(player, 8)
                     }
                 },
                 undefined,
@@ -139,6 +140,7 @@ export default class GameScene extends Phaser.Scene
 
             } else {
                 this.cameras.main.startFollow(playerEntity, false, 0.1, 0.1)
+                this.healthText = this.add.text(this.cameras.main.scrollX, this.cameras.main.scrollY, this.currentPlayer().health.toString(), { fontSize: "6em "})
             }
         }
 
@@ -173,7 +175,7 @@ export default class GameScene extends Phaser.Scene
     }
 
     update(time: number, delta: number): void {
-        if (!this.currentPlayer) {
+        if (!this.room || !this.currentPlayer()) {
             return
         }
 
@@ -181,6 +183,10 @@ export default class GameScene extends Phaser.Scene
         while (this.elapsedTime >= this.fixedTimeStep) {
             this.elapsedTime -= this.fixedTimeStep
             this.fixedTick(time, this.fixedTimeStep)
+        }
+
+        if (this.healthText) {
+            this.healthText.setPosition(this.cameras.main.scrollX, this.cameras.main.scrollY)
         }
     }
 
@@ -259,5 +265,12 @@ export default class GameScene extends Phaser.Scene
             }
         }
         throw "No player exists with that entity"
+    }
+
+    damagePlayer(player: Player, dmg: number): void {
+        player.damage(dmg)
+        if (player === this.currentPlayer()) {
+            this.healthText?.setText(player.health.toString())
+        }
     }
 }

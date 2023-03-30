@@ -4,17 +4,14 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
     }
 
     fire(fromX: number, fromY: number, toX: number, toY: number) {
-        this.body.reset(fromX, fromY)
-        this.setActive(true)
-        this.setVisible(true)
+        this.enableBody(true, fromX, fromY, true, true)
 
         const vector = new Phaser.Math.Vector2(toX, toY).normalize().scale(1000)
         this.setVelocity(vector.x, vector.y)
     }
 
     disable() {
-        this.setActive(false)
-        this.setVisible(false)
+        this.disableBody(true, true)
     }
 
     protected preUpdate(time: number, delta: number): void {
@@ -31,7 +28,7 @@ export class ProjectileGroup extends Phaser.Physics.Arcade.Group {
         this.createMultiple({
             classType: Projectile,
             active: false,
-            frameQuantity: 30,
+            frameQuantity: 10,
             visible: false,
             key: 'projectile'
         })
