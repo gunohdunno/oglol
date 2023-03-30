@@ -1,0 +1,104 @@
+{
+	"textures": [
+		{
+			"image": "charactor01.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 16,
+				"h": 92
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Adam_idle_16x16-0.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 16,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 9,
+						"w": 16,
+						"h": 23
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 16,
+						"h": 23
+					}
+				},
+				{
+					"filename": "Adam_idle_16x16-1.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 16,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 9,
+						"w": 16,
+						"h": 23
+					},
+					"frame": {
+						"x": 0,
+						"y": 23,
+						"w": 16,
+						"h": 23
+					}
+				},
+				{
+					"filename": "Adam_idle_16x16-2.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 16,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 9,
+						"w": 16,
+						"h": 23
+					},
+					"frame": {
+						"x": 0,
+						"y": 46,
+						"w": 16,
+						"h": 23
+					}
+				},
+				{
+					"filename": "Adam_idle_16x16-3.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 16,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 9,
+						"w": 16,
+						"h": 23
+					},
+					"frame": {
+						"x": 0,
+						"y": 69,
+						"w": 16,
+						"h": 23
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:105580cef1bbefa670a437e12b71661d:dcc746527b6d16fe96e629858a7c0af0:5fdcbbbf29df0716b701f8f9c380aea4$"
+	}
+}

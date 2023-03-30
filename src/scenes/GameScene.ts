@@ -64,6 +64,7 @@ export default class GameScene extends Phaser.Scene
         // load map tiles
         this.load.image('tiles', 'assets/tilemaps/map_tileset.png')
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/map02.json')
+        this.load.atlas("adam", "assets/spritesheets/adam/spritesheet.png", "assets/spritesheets/adam/info.json")
 
         this.directionKeys = {
             up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
@@ -100,6 +101,8 @@ export default class GameScene extends Phaser.Scene
         const belowLayer = map.createLayer('below_layer', tileset, 0, 0)
         const aboveLayer = map.createLayer('above_layer', tileset, 0, 0)
 
+        aboveLayer.setCollisionByProperty({ collides: true })
+
         // create room
         this.roomId = this.room.id
         const codeSpan = document.getElementById("room-code")
@@ -108,8 +111,13 @@ export default class GameScene extends Phaser.Scene
         }
 
         this.playerGroup = new Phaser.Physics.Arcade.Group(this.physics.world, this)
-        this.room.state.players.onAdd = (playerState, sessionId) => {
-            const playerEntity = this.physics.add.image(playerState.position.x, playerState.position.y, 'ball')
+        this.room.state.players.onAdd = (player, sessionId) => {
+            const playerEntity = this.physics.add
+                .sprite(player.position.x, player.position.y, 'adam', 'Adam_idle_16x16-3.png')
+                .setScale(2)
+            playerEntity.body.setSize(16,23)
+
+            this.physics.add.collider(playerEntity, aboveLayer)
             const projectileGroup = new ProjectileGroup(this)
             this.players[sessionId] = new Player(playerEntity, projectileGroup)
 
@@ -196,7 +204,9 @@ export default class GameScene extends Phaser.Scene
             return
         }
 
-        const velocity = 6;
+        const velocity = 250;
+        this.currentPlayer()?.entity.setVelocityX(0)
+        this.currentPlayer()?.entity.setVelocityY(0)
         this.inputPayload.left = this.directionKeys.left.isDown
         this.inputPayload.right = this.directionKeys.right.isDown
         this.inputPayload.up = this.directionKeys.up.isDown
@@ -221,15 +231,15 @@ export default class GameScene extends Phaser.Scene
         this.room.send('playerInput', this.inputPayload)
 
         if (this.inputPayload.left) {
-            this.currentPlayer().entity.x -= velocity;
+            this.currentPlayer().entity.setVelocityX(-velocity)
         } else if (this.inputPayload.right) {
-            this.currentPlayer().entity.x += velocity;
+            this.currentPlayer().entity.setVelocityX(velocity)
         }
 
         if (this.inputPayload.up) {
-            this.currentPlayer().entity.y -= velocity;
+            this.currentPlayer().entity.setVelocityY(-velocity)
         } else if (this.inputPayload.down) {
-            this.currentPlayer().entity.y += velocity;
+            this.currentPlayer().entity.setVelocityY(velocity)
         }
 
         for (let sessionId in this.players) {
