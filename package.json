@@ -12,7 +12,8 @@
     "start": "npm run init && parcel src/index.html -p 8000",
     "build": "npm run init && parcel build src/index.html --dist-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
+    "prepare": "husky install"
   },
   "author": "supertommy",
   "license": "MIT",
@@ -27,6 +28,8 @@
     "@typescript-eslint/parser": "^2.29.0",
     "babel-loader": "^9.1.2",
     "eslint": "^6.8.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
     "minimist": ">=1.2.2",
     "path": "^0.12.7",
     "prettier": "2.8.7",
@@ -40,5 +43,8 @@
   "staticFiles": {
     "staticPath": "./src/assets",
     "watcherGlob": "**"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
