@@ -1,6 +1,6 @@
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-		super(scene, x, y, 'projectile');
+		super(scene, x, y, 'projectile', 'bullet.png')
     }
 
     fire(fromX: number, fromY: number, toX: number, toY: number) {
@@ -30,7 +30,8 @@ export class ProjectileGroup extends Phaser.Physics.Arcade.Group {
             active: false,
             frameQuantity: 10,
             visible: false,
-            key: 'projectile'
+            key: 'projectile',
+            setScale: {x: 5, y: 5}
         })
     }
 
