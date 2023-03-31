@@ -1,41 +1,41 @@
 {
-	"textures": [
-		{
-			"image": "bullet_spritesheet.png",
-			"format": "RGBA8888",
-			"size": {
-				"w": 8,
-				"h": 8
-			},
-			"scale": 1,
-			"frames": [
-				{
-					"filename": "bullet.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 8,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 1,
-						"w": 6,
-						"h": 6
-					},
-					"frame": {
-						"x": 1,
-						"y": 1,
-						"w": 6,
-						"h": 6
-					}
-				}
-			]
-		}
-	],
-	"meta": {
-		"app": "https://www.codeandweb.com/texturepacker",
-		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:62c5533d701a41aa2f8abd3714c02c9e:266e30901b1bde77a4dc4d0e812cc0f7:c6c445cb86b8775a9257dc0fb4bccc03$"
-	}
+  "textures": [
+    {
+      "image": "bullet_spritesheet.png",
+      "format": "RGBA8888",
+      "size": {
+        "w": 8,
+        "h": 8
+      },
+      "scale": 1,
+      "frames": [
+        {
+          "filename": "bullet.png",
+          "rotated": false,
+          "trimmed": true,
+          "sourceSize": {
+            "w": 8,
+            "h": 8
+          },
+          "spriteSourceSize": {
+            "x": 1,
+            "y": 1,
+            "w": 6,
+            "h": 6
+          },
+          "frame": {
+            "x": 1,
+            "y": 1,
+            "w": 6,
+            "h": 6
+          }
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "version": "3.0",
+    "smartupdate": "$TexturePacker:SmartUpdate:62c5533d701a41aa2f8abd3714c02c9e:266e30901b1bde77a4dc4d0e812cc0f7:c6c445cb86b8775a9257dc0fb4bccc03$"
+  }
 }

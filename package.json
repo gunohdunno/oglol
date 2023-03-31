@@ -1,43 +1,44 @@
 {
-	"name": "phaser3-parcel-template",
-	"version": "1.0.0",
-	"description": "A typescript template project for Phaser 3 using Parceljs",
-	"scripts": {
-		"clean-dist": "rm -rf dist && mkdir dist",
-        "copy-img": "cp -vR ./src/img ./dist",
-        "copy-data": "cp -r src/data.json dist",
-        "copy-assets": "cp -r src/assets dist",
-        "copy-files": "npm run copy-assets",
-        "init": "npm run clean-dist && npm run copy-files",
-		"start": "npm run init && parcel src/index.html -p 8000",
-		"build": "npm run init && parcel build src/index.html --dist-dir dist",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
-	},
-	"author": "supertommy",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/ourcade/phaser3-parcel-template.git"
-	},
-	"homepage": "https://github.com/ourcade/phaser3-parcel-template",
-	"devDependencies": {
-		"@babel/core": "^7.21.3",
-		"@typescript-eslint/eslint-plugin": "^2.29.0",
-		"@typescript-eslint/parser": "^2.29.0",
-		"babel-loader": "^9.1.2",
-		"eslint": "^6.8.0",
-		"minimist": ">=1.2.2",
-		"path": "^0.12.7",
-		"typescript": "^3.8.3"
-	},
-	"dependencies": {
-		"colyseus.js": "^0.14.13",
-		"parcel": "^2.8.3",
-		"phaser": "^3.55.2"
-	},
-	"staticFiles": {
-		"staticPath": "./src/assets",
-		"watcherGlob": "**"
-	}
+  "name": "phaser3-parcel-template",
+  "version": "1.0.0",
+  "description": "A typescript template project for Phaser 3 using Parceljs",
+  "scripts": {
+    "clean-dist": "rm -rf dist && mkdir dist",
+    "copy-img": "cp -vR ./src/img ./dist",
+    "copy-data": "cp -r src/data.json dist",
+    "copy-assets": "cp -r src/assets dist",
+    "copy-files": "npm run copy-assets",
+    "init": "npm run clean-dist && npm run copy-files",
+    "start": "npm run init && parcel src/index.html -p 8000",
+    "build": "npm run init && parcel build src/index.html --dist-dir dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
+  },
+  "author": "supertommy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ourcade/phaser3-parcel-template.git"
+  },
+  "homepage": "https://github.com/ourcade/phaser3-parcel-template",
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "babel-loader": "^9.1.2",
+    "eslint": "^6.8.0",
+    "minimist": ">=1.2.2",
+    "path": "^0.12.7",
+    "prettier": "2.8.7",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "colyseus.js": "^0.14.13",
+    "parcel": "^2.8.3",
+    "phaser": "^3.55.2"
+  },
+  "staticFiles": {
+    "staticPath": "./src/assets",
+    "watcherGlob": "**"
+  }
 }
