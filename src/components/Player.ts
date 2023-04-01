@@ -33,6 +33,11 @@ export class Player {
 
   unalive(): void {
     this.alive = false;
-    this.entity.destroy();
+    this.entity.disableBody(true, true)
+  }
+
+  respawn(x: number, y: number): void {
+    this.alive = true
+    this.entity.enableBody(true, x, y, true, true);
   }
 }

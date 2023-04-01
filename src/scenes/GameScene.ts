@@ -228,6 +228,10 @@ export default class GameScene extends Phaser.Scene {
         message.velocity.y
       );
     });
+
+    this.room.onMessage("respawn", ({ id, x, y }) => {
+      this.players[id].respawn(x, y)
+    })
   }
 
   update(time: number, delta: number): void {
