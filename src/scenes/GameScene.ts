@@ -24,6 +24,7 @@ interface ShootInput {
 interface InputPayload {
   position: PositionInput;
   shoot: ShootInput;
+  spriteFrameKey: String;
 }
 
 export default class GameScene extends Phaser.Scene {
@@ -44,6 +45,7 @@ export default class GameScene extends Phaser.Scene {
       y: 0,
       active: false,
     },
+    spriteFrameKey: "adam_front.png",
   };
   directionKeys: DirectionKeys | undefined;
   elapsedTime = 0;
@@ -129,13 +131,20 @@ export default class GameScene extends Phaser.Scene {
           playerState.position.x,
           playerState.position.y,
           "adam",
-          "Adam_idle_16x16-3.png"
+          "adam_front.png"
         )
         .setScale(2);
       playerEntity.body.setSize(16, 16);
 
       this.physics.add.collider(playerEntity, aboveLayer);
       const projectileGroup = new ProjectileGroup(this);
+      this.physics.add.collider(
+        aboveLayer,
+        projectileGroup,
+        (projectile: Phaser.Types.Physics.Arcade.GameObjectWithBody) => {
+          (projectile as Projectile).disable();
+        }
+      );
       this.players[sessionId] = new Player(playerEntity, projectileGroup);
       this.players[sessionId].sessionId = sessionId;
 
@@ -177,6 +186,7 @@ export default class GameScene extends Phaser.Scene {
           // I guess it's just a place to store arbitrary data?
           playerEntity.setData("serverX", playerState.position.x);
           playerEntity.setData("serverY", playerState.position.y);
+          playerEntity.setData("spriteFrameKey", playerState.spriteFrameKey);
         };
       } else {
         this.cameras.main.startFollow(playerEntity, false, 0.1, 0.1);
@@ -297,14 +307,18 @@ export default class GameScene extends Phaser.Scene {
       const velocityVector = new Phaser.Math.Vector2(0, 0);
 
       if (left) {
+        currentPlayer.entity.setFrame("adam_left.png");
         velocityVector.x = -1;
       } else if (right) {
+        currentPlayer.entity.setFrame("adam_right.png");
         velocityVector.x = 1;
       }
 
       if (up) {
+        currentPlayer.entity.setFrame("adam_back.png");
         velocityVector.y = -1;
       } else if (down) {
+        currentPlayer.entity.setFrame("adam_front.png");
         velocityVector.y = 1;
       }
 
@@ -325,10 +339,11 @@ export default class GameScene extends Phaser.Scene {
         continue;
       }
 
-      const { serverX, serverY } = entity.data.values;
+      const { serverX, serverY, spriteFrameKey } = entity.data.values;
 
       entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15);
       entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15);
+      entity.setFrame(spriteFrameKey);
     }
   }
 
@@ -358,6 +373,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.inputPayload.position.x = currentPlayer.entity.x;
     this.inputPayload.position.y = currentPlayer.entity.y;
+    this.inputPayload.spriteFrameKey = currentPlayer.entity.frame.name;
 
     this.room.send("playerInput", this.inputPayload);
   }
