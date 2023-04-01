@@ -16,7 +16,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
 
   protected preUpdate(time: number, delta: number): void {
     super.preUpdate(time, delta);
-    if (this.y <= 0 || this.y >= 1500 || this.x <= 0 || this.x >= 1500) {
+    if (this.y < 0 || this.y >= 1500 || this.x <= 0 || this.x >= 2000) {
       this.disable();
     }
   }
