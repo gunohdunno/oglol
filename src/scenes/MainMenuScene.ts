@@ -30,7 +30,6 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   onRoomCreatePress() {
-    console.log("room create button");
     this.scene.start("game-scene");
   }
 
@@ -38,7 +37,6 @@ export default class MainMenuScene extends Phaser.Scene {
     const formElement = <HTMLInputElement>(
       document.getElementById(this.inputElId)
     );
-    console.log(formElement?.value);
     this.scene.start("game-scene", { roomId: formElement?.value });
   }
 }
