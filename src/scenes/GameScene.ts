@@ -10,6 +10,11 @@ interface DirectionKeys {
   right: Phaser.Input.Keyboard.Key;
 }
 
+interface PositionInput {
+  x: number;
+  y: number;
+}
+
 interface ShootInput {
   x: number;
   y: number;
@@ -17,10 +22,7 @@ interface ShootInput {
 }
 
 interface InputPayload {
-  left: boolean;
-  right: boolean;
-  up: boolean;
-  down: boolean;
+  position: PositionInput;
   shoot: ShootInput;
 }
 
@@ -33,10 +35,10 @@ export default class GameScene extends Phaser.Scene {
   room: Room | undefined;
   players: { [sessionId: string]: Player } = {};
   inputPayload: InputPayload = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
+    position: {
+      x: 0,
+      y: 0,
+    },
     shoot: {
       x: 0,
       y: 0,
@@ -55,6 +57,7 @@ export default class GameScene extends Phaser.Scene {
   };
   playerGroup: Phaser.Physics.Arcade.Group | undefined;
   healthText: Phaser.GameObjects.Text | undefined;
+  playerSpeed = 400;
 
   preload() {
     // load map tiles
@@ -224,66 +227,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   fixedTick(_time: number, _delta: number) {
-    if (!this.room) {
-      return;
-    }
-
-    const velocity = 250;
-    const currentPlayer = this.currentPlayer();
-    currentPlayer.entity.setVelocityX(0);
-    currentPlayer.entity.setVelocityY(0);
-    this.inputPayload.left = this.directionKeys.left.isDown;
-    this.inputPayload.right = this.directionKeys.right.isDown;
-    this.inputPayload.up = this.directionKeys.up.isDown;
-    this.inputPayload.down = this.directionKeys.down.isDown;
-
-    if (this.shootInput.active) {
-      this.inputPayload.shoot = {
-        x: this.shootInput.x,
-        y: this.shootInput.y,
-        active: true,
-      };
-      this.shootInput.active = false;
-      currentPlayer.projectileGroup.fireProjectile(
-        currentPlayer.entity.x,
-        currentPlayer.entity.y,
-        this.shootInput.x,
-        this.shootInput.y
-      );
-    } else {
-      this.inputPayload.shoot.active = false;
-    }
-
-    this.room.send("playerInput", this.inputPayload);
-
-    if (this.inputPayload.left) {
-      currentPlayer.entity.setVelocityX(-velocity);
-    } else if (this.inputPayload.right) {
-      currentPlayer.entity.setVelocityX(velocity);
-    }
-
-    if (this.inputPayload.up) {
-      currentPlayer.entity.setVelocityY(-velocity);
-    } else if (this.inputPayload.down) {
-      currentPlayer.entity.setVelocityY(velocity);
-    }
-
-    for (let sessionId in this.players) {
-      if (sessionId === this.room.sessionId) {
-        continue;
-      }
-
-      const entity = this.players[sessionId].entity;
-
-      if (!entity.data) {
-        continue;
-      }
-
-      const { serverX, serverY } = entity.data.values;
-
-      entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15);
-      entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15);
-    }
+    this.updatePlayerPhysics();
+    this.sendInputToServer();
   }
 
   currentPlayer(): Player {
@@ -308,5 +253,87 @@ export default class GameScene extends Phaser.Scene {
     if (player === this.currentPlayer()) {
       this.healthText?.setText(player.health.toString());
     }
+  }
+
+  updatePlayerPhysics(): void {
+    if (!this.room || !this.directionKeys) {
+      return;
+    }
+
+    const currentPlayer = this.currentPlayer();
+
+    const left = this.directionKeys.left.isDown;
+    const right = this.directionKeys.right.isDown;
+    const up = this.directionKeys.up.isDown;
+    const down = this.directionKeys.down.isDown;
+
+    currentPlayer.entity.setVelocityX(0);
+    currentPlayer.entity.setVelocityY(0);
+
+    const velocityVector = new Phaser.Math.Vector2(0, 0);
+
+    if (left) {
+      velocityVector.x = -1;
+    } else if (right) {
+      velocityVector.x = 1;
+    }
+
+    if (up) {
+      velocityVector.y = -1;
+    } else if (down) {
+      velocityVector.y = 1;
+    }
+
+    velocityVector.normalize().scale(this.playerSpeed);
+
+    currentPlayer.entity.setVelocityX(velocityVector.x);
+    currentPlayer.entity.setVelocityY(velocityVector.y);
+
+    for (let sessionId in this.players) {
+      if (sessionId === this.room.sessionId) {
+        continue;
+      }
+
+      const entity = this.players[sessionId].entity;
+
+      if (!entity.data) {
+        continue;
+      }
+
+      const { serverX, serverY } = entity.data.values;
+
+      entity.x = Phaser.Math.Linear(entity.x, serverX, 0.15);
+      entity.y = Phaser.Math.Linear(entity.y, serverY, 0.15);
+    }
+  }
+
+  sendInputToServer(): void {
+    if (!this.room) {
+      return;
+    }
+
+    const currentPlayer = this.currentPlayer();
+
+    if (this.shootInput.active) {
+      this.inputPayload.shoot = {
+        x: this.shootInput.x,
+        y: this.shootInput.y,
+        active: true,
+      };
+      this.shootInput.active = false;
+      currentPlayer.projectileGroup.fireProjectile(
+        currentPlayer.entity.x,
+        currentPlayer.entity.y,
+        this.shootInput.x,
+        this.shootInput.y
+      );
+    } else {
+      this.inputPayload.shoot.active = false;
+    }
+
+    this.inputPayload.position.x = currentPlayer.entity.x;
+    this.inputPayload.position.y = currentPlayer.entity.y;
+
+    this.room.send("playerInput", this.inputPayload);
   }
 }
