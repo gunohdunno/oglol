@@ -262,32 +262,34 @@ export default class GameScene extends Phaser.Scene {
 
     const currentPlayer = this.currentPlayer();
 
-    const left = this.directionKeys.left.isDown;
-    const right = this.directionKeys.right.isDown;
-    const up = this.directionKeys.up.isDown;
-    const down = this.directionKeys.down.isDown;
+    if (currentPlayer.alive) {
+      const left = this.directionKeys.left.isDown;
+      const right = this.directionKeys.right.isDown;
+      const up = this.directionKeys.up.isDown;
+      const down = this.directionKeys.down.isDown;
 
-    currentPlayer.entity.setVelocityX(0);
-    currentPlayer.entity.setVelocityY(0);
+      currentPlayer.entity.setVelocityX(0);
+      currentPlayer.entity.setVelocityY(0);
 
-    const velocityVector = new Phaser.Math.Vector2(0, 0);
+      const velocityVector = new Phaser.Math.Vector2(0, 0);
 
-    if (left) {
-      velocityVector.x = -1;
-    } else if (right) {
-      velocityVector.x = 1;
+      if (left) {
+        velocityVector.x = -1;
+      } else if (right) {
+        velocityVector.x = 1;
+      }
+
+      if (up) {
+        velocityVector.y = -1;
+      } else if (down) {
+        velocityVector.y = 1;
+      }
+
+      velocityVector.normalize().scale(this.playerSpeed);
+
+      currentPlayer.entity.setVelocityX(velocityVector.x);
+      currentPlayer.entity.setVelocityY(velocityVector.y);
     }
-
-    if (up) {
-      velocityVector.y = -1;
-    } else if (down) {
-      velocityVector.y = 1;
-    }
-
-    velocityVector.normalize().scale(this.playerSpeed);
-
-    currentPlayer.entity.setVelocityX(velocityVector.x);
-    currentPlayer.entity.setVelocityY(velocityVector.y);
 
     for (let sessionId in this.players) {
       if (sessionId === this.room.sessionId) {
