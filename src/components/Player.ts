@@ -17,8 +17,17 @@ export class Player {
 
   damage(delta: number): void {
     this.health -= delta;
-    if (this.health < 0) {
-      this.unalive();
+    this.checkAlive()
+  }
+
+  setHealth(health: number): void {
+    this.health = health
+    this.checkAlive()
+  }
+
+  checkAlive(): void {
+    if (this.health <= 0) {
+      this.unalive()
     }
   }
 

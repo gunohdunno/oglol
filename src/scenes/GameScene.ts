@@ -153,7 +153,6 @@ export default class GameScene extends Phaser.Scene {
           if (playerBody !== playerEntity) {
             (projectile as Projectile).disable();
             const player = this.findPlayerByEntity(playerBody);
-            this.damagePlayer(player, this.projectileDamage);
             const shooter = this.findShooter(projectile as Projectile);
             if (shooter) {
               const shooterId = shooter.sessionId;
@@ -165,6 +164,11 @@ export default class GameScene extends Phaser.Scene {
         undefined,
         this
       );
+
+      // TODO: remove listener in onRemove()
+      playerState.listen("health", () => {
+        this.updateHealth(this.players[sessionId], playerState.health)
+      })
 
       if (sessionId !== this.room?.sessionId) {
         // remote players
@@ -267,8 +271,8 @@ export default class GameScene extends Phaser.Scene {
     return null;
   }
 
-  damagePlayer(player: Player, dmg: number): void {
-    player.damage(dmg);
+  updateHealth(player: Player, health: number): void {
+    player.setHealth(health);
     if (player === this.currentPlayer()) {
       this.healthText?.setText(player.health.toString());
     }
