@@ -229,9 +229,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     const velocity = 250;
-    // TODO change this so it syncs correctly with other player
-    this.currentPlayer()?.entity.setVelocityX(0);
-    this.currentPlayer()?.entity.setVelocityY(0);
+    const currentPlayer = this.currentPlayer();
+    currentPlayer.entity.setVelocityX(0);
+    currentPlayer.entity.setVelocityY(0);
     this.inputPayload.left = this.directionKeys.left.isDown;
     this.inputPayload.right = this.directionKeys.right.isDown;
     this.inputPayload.up = this.directionKeys.up.isDown;
@@ -244,9 +244,9 @@ export default class GameScene extends Phaser.Scene {
         active: true,
       };
       this.shootInput.active = false;
-      this.currentPlayer().projectileGroup.fireProjectile(
-        this.currentPlayer().entity.x,
-        this.currentPlayer().entity.y,
+      currentPlayer.projectileGroup.fireProjectile(
+        currentPlayer.entity.x,
+        currentPlayer.entity.y,
         this.shootInput.x,
         this.shootInput.y
       );
@@ -257,15 +257,15 @@ export default class GameScene extends Phaser.Scene {
     this.room.send("playerInput", this.inputPayload);
 
     if (this.inputPayload.left) {
-      this.currentPlayer().entity.setVelocityX(-velocity);
+      currentPlayer.entity.setVelocityX(-velocity);
     } else if (this.inputPayload.right) {
-      this.currentPlayer().entity.setVelocityX(velocity);
+      currentPlayer.entity.setVelocityX(velocity);
     }
 
     if (this.inputPayload.up) {
-      this.currentPlayer().entity.setVelocityY(-velocity);
+      currentPlayer.entity.setVelocityY(-velocity);
     } else if (this.inputPayload.down) {
-      this.currentPlayer().entity.setVelocityY(velocity);
+      currentPlayer.entity.setVelocityY(velocity);
     }
 
     for (let sessionId in this.players) {
