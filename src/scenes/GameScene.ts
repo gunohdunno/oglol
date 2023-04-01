@@ -118,11 +118,11 @@ export default class GameScene extends Phaser.Scene {
       this.physics.world,
       this
     );
-    this.room.state.players.onAdd = (player, sessionId) => {
+    this.room.state.players.onAdd = (playerState, sessionId) => {
       const playerEntity = this.physics.add
         .sprite(
-          player.position.x,
-          player.position.y,
+          playerState.position.x,
+          playerState.position.y,
           "adam",
           "Adam_idle_16x16-3.png"
         )
@@ -156,11 +156,11 @@ export default class GameScene extends Phaser.Scene {
 
       if (sessionId !== this.room?.sessionId) {
         // remote players
-        player.position.onChange = () => {
+        playerState.position.onChange = () => {
           // Need to further explore what the setData here is for.
           // I guess it's just a place to store arbitrary data?
-          playerEntity.setData("serverX", player.position.x);
-          playerEntity.setData("serverY", player.position.y);
+          playerEntity.setData("serverX", playerState.position.x);
+          playerEntity.setData("serverY", playerState.position.y);
         };
       } else {
         this.cameras.main.startFollow(playerEntity, false, 0.1, 0.1);
