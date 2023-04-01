@@ -136,6 +136,13 @@ export default class GameScene extends Phaser.Scene {
 
       this.physics.add.collider(playerEntity, aboveLayer);
       const projectileGroup = new ProjectileGroup(this);
+      this.physics.add.collider(
+        aboveLayer,
+        projectileGroup,
+        (projectile: Phaser.Types.Physics.Arcade.GameObjectWithBody) => {
+          (projectile as Projectile).disable();
+        }
+      );
       this.players[sessionId] = new Player(playerEntity, projectileGroup);
 
       if (!this.playerGroup) {
