@@ -6,6 +6,7 @@ export class Player {
   alive: boolean;
   health: number;
   maxHealth = 100;
+  sessionId = "";
 
   constructor(entity, projectileGroup) {
     this.entity = entity;

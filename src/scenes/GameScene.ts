@@ -58,6 +58,7 @@ export default class GameScene extends Phaser.Scene {
   playerGroup: Phaser.Physics.Arcade.Group | undefined;
   healthText: Phaser.GameObjects.Text | undefined;
   playerSpeed = 400;
+  projectileDamage = 8;
 
   preload() {
     // load map tiles
@@ -116,6 +117,7 @@ export default class GameScene extends Phaser.Scene {
     if (codeSpan) {
       codeSpan.textContent = this.roomId;
     }
+    console.log(`Our ID is ${this.room.sessionId}`);
 
     this.playerGroup = new Phaser.Physics.Arcade.Group(
       this.physics.world,
@@ -135,6 +137,7 @@ export default class GameScene extends Phaser.Scene {
       this.physics.add.collider(playerEntity, aboveLayer);
       const projectileGroup = new ProjectileGroup(this);
       this.players[sessionId] = new Player(playerEntity, projectileGroup);
+      this.players[sessionId].sessionId = sessionId;
 
       if (!this.playerGroup) {
         return;
@@ -150,7 +153,13 @@ export default class GameScene extends Phaser.Scene {
           if (playerBody !== playerEntity) {
             (projectile as Projectile).disable();
             const player = this.findPlayerByEntity(playerBody);
-            this.damagePlayer(player, 8);
+            this.damagePlayer(player, this.projectileDamage);
+            const shooter = this.findShooter(projectile as Projectile);
+            if (shooter) {
+              const shooterId = shooter.sessionId;
+              const victimId = player.sessionId;
+              this.room?.send("hit", { shooterId, victimId });
+            }
           }
         },
         undefined,
@@ -246,6 +255,16 @@ export default class GameScene extends Phaser.Scene {
       }
     }
     throw "No player exists with that entity";
+  }
+
+  findShooter(projectile: Projectile): Player | null {
+    for (let sessionId in this.players) {
+      const player = this.players[sessionId];
+      if (player.projectileGroup.children.contains(projectile)) {
+        return player;
+      }
+    }
+    return null;
   }
 
   damagePlayer(player: Player, dmg: number): void {
