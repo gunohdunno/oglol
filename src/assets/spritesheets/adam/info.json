@@ -1,7 +1,7 @@
 {
   "textures": [
     {
-      "image": "charactor01.png",
+      "image": "spritesheet.png",
       "format": "RGBA8888",
       "size": {
         "w": 16,
@@ -10,7 +10,7 @@
       "scale": 1,
       "frames": [
         {
-          "filename": "Adam_idle_16x16-0.png",
+          "filename": "adam_right.png",
           "rotated": false,
           "trimmed": true,
           "sourceSize": {
@@ -31,7 +31,7 @@
           }
         },
         {
-          "filename": "Adam_idle_16x16-1.png",
+          "filename": "adam_back.png",
           "rotated": false,
           "trimmed": true,
           "sourceSize": {
@@ -52,7 +52,7 @@
           }
         },
         {
-          "filename": "Adam_idle_16x16-2.png",
+          "filename": "adam_left.png",
           "rotated": false,
           "trimmed": true,
           "sourceSize": {
@@ -73,7 +73,7 @@
           }
         },
         {
-          "filename": "Adam_idle_16x16-3.png",
+          "filename": "adam_front.png",
           "rotated": false,
           "trimmed": true,
           "sourceSize": {
