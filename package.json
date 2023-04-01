@@ -10,6 +10,7 @@
     "copy-files": "npm run copy-assets",
     "init": "npm run clean-dist && npm run copy-files",
     "start": "npm run init && parcel src/index.html -p 8000",
+    "production": "npm run init && parcel src/index.html",
     "build": "npm run init && parcel build src/index.html --dist-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
