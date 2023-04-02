@@ -64,7 +64,7 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     if (process.env.PRODUCTION === "true") {
-      this.client = new Client("https://oglol-backend.onrender.com");
+      this.client = new Client("wss://oglol-backend.onrender.com");
     } else {
       this.client = new Client("ws://localhost:2567");
     }
@@ -102,10 +102,10 @@ export default class GameScene extends Phaser.Scene {
     }
     try {
       if (this.roomId) {
-        console.log("Creating room...");
+        console.log(`Joining room... ${this.roomId}`);
         this.room = await this.client.joinById(this.roomId);
       } else {
-        console.log(`Joining room... ${this.roomId}`);
+        console.log("Creating room...");
         this.room = await this.client.create("my_room");
       }
       console.log("Joined room successfully!");
