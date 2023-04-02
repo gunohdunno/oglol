@@ -25,6 +25,7 @@
   "homepage": "https://github.com/ourcade/phaser3-parcel-template",
   "devDependencies": {
     "@babel/core": "^7.21.3",
+    "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "babel-loader": "^9.1.2",

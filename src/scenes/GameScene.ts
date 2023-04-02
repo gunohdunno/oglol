@@ -32,7 +32,7 @@ export default class GameScene extends Phaser.Scene {
     super("game-scene");
   }
 
-  client = new Client("ws://localhost:2567");
+  client: Client | undefined;
   room: Room | undefined;
   players: { [sessionId: string]: Player } = {};
   inputPayload: InputPayload = {
@@ -63,6 +63,11 @@ export default class GameScene extends Phaser.Scene {
   projectileDamage = 8;
 
   preload() {
+    if (process.env.PRODUCTION === "true") {
+      this.client = new Client("https://oglol-backend.onrender.com");
+    } else {
+      this.client = new Client("ws://localhost:2567");
+    }
     // load map tiles
     this.load.image("tiles", "assets/tilemaps/map_tileset.png");
     this.load.tilemapTiledJSON("map", "assets/tilemaps/map02.json");
@@ -176,8 +181,8 @@ export default class GameScene extends Phaser.Scene {
 
       // TODO: remove listener in onRemove()
       playerState.listen("health", () => {
-        this.updateHealth(this.players[sessionId], playerState.health)
-      })
+        this.updateHealth(this.players[sessionId], playerState.health);
+      });
 
       if (sessionId !== this.room?.sessionId) {
         // remote players
@@ -230,8 +235,8 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.room.onMessage("respawn", ({ id, x, y }) => {
-      this.players[id].respawn(x, y)
-    })
+      this.players[id].respawn(x, y);
+    });
   }
 
   update(time: number, delta: number): void {
