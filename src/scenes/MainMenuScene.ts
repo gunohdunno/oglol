@@ -10,8 +10,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
     const createButton = new Button(
       this,
-      190,
-      150,
+      380,
+      250,
       "Create Room",
       buttonStyle,
       () => this.onRoomCreatePress()
@@ -20,8 +20,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
     const joinButton = new Button(
       this,
-      80,
-      350,
+      250,
+      450,
       "Join Existing Room",
       buttonStyle,
       () => this.onRoomJoinPress()
