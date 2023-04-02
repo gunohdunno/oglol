@@ -97,11 +97,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   async create() {
+    if (!this.client) {
+      throw "Uhhhh there's no client?";
+    }
     try {
-      console.log("Joining room...");
       if (this.roomId) {
+        console.log("Creating room...");
         this.room = await this.client.joinById(this.roomId);
       } else {
+        console.log(`Joining room... ${this.roomId}`);
         this.room = await this.client.create("my_room");
       }
       console.log("Joined room successfully!");
